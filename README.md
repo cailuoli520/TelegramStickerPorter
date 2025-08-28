@@ -63,8 +63,8 @@
 克隆#您的贴纸包（或表情包）名称#需要克隆的贴纸包（或表情包）链接
  
 例如：  
-克隆#我的可爱表情包#https://t.me/addemoji/Riniba_StaticEmojiAuto  
-克隆#我的酷酷的贴纸包#https://t.me/addstickers/Riniba_Packs  
+克隆#我的可爱表情包#https://t.me/addstickers/pack_bafb8ef1_by_stickerporter_bot  
+克隆#我的酷酷的贴纸包#https://t.me/addemoji/pack_7f810f59_by_stickerporter_bot  
 
 🔹 克隆：命令前缀，触发克隆操作  
 🔹 您的贴纸包（或表情包）名称：您希望克隆后新包的名称  
