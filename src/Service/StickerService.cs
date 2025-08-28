@@ -21,15 +21,26 @@ public class StickerService
             .AppendLine("<code>克隆#您的贴纸包（或表情包）名称#需要克隆的贴纸包（或表情包）链接</code>")
             .AppendLine()
             .AppendLine("例如：")
-            .AppendLine("<code>克隆#我的可爱表情包#https://t.me/addemoji/Riniba_StaticEmojiAuto</code>")
+            .AppendLine("<code>克隆#我的可爱表情包#https://t.me/addstickers/pack_bafb8ef1_by_stickerporter_bot</code>")
             .AppendLine()
-            .AppendLine("<code>克隆#我的酷酷的贴纸包#https://t.me/addstickers/Riniba_Packs</code>")
+            .AppendLine("<code>克隆#我的酷酷的贴纸包#https://t.me/addemoji/pack_7f810f59_by_stickerporter_bot</code>")
             .AppendLine()
             .AppendLine("🔹 <b>克隆</b>：命令前缀，触发克隆操作。")
             .AppendLine("🔹 <b>您的贴纸包（或表情包）名称</b>：您希望克隆后新贴纸包（或表情包）的名称。")
             .AppendLine("🔹 <b>需要克隆的贴纸包（或表情包）链接</b>：原始贴纸（或表情包）的链接。")
             .AppendLine()
             .AppendLine("请确保信息填写正确，以便程序顺利克隆哦～ 🚀")
+            .ToString();
+
+        await _messageService.SendMessageAsync(bot, msg.Chat.Id, messageText, replyParameters: msg);
+    }
+
+    public async Task SendStickerInfoAsync(Bot bot, Telegram.Bot.Types.Message msg)
+    {
+        var messageText = new StringBuilder()
+            .AppendLine("💎 <b>开源地址:</b> 💎")
+            .AppendLine("https://github.com/Riniba/TelegramStickerPorter")
+            .AppendLine()
             .ToString();
 
         await _messageService.SendMessageAsync(bot, msg.Chat.Id, messageText, replyParameters: msg);

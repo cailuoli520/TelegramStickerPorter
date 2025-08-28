@@ -18,7 +18,7 @@ public class TelegramBotClientManager
             try
             {
                 StopBot();
-                
+
                 var data = App.GetConfig<TelegramOptions>("Telegram");
                 var basePath = AppContext.BaseDirectory;
                 var dbPath = Path.Combine(basePath, "TelegramBot.sqlite");
@@ -30,7 +30,7 @@ public class TelegramBotClientManager
                     data.ApiHash,
                     connection,
                     SqlCommands.Sqlite);
-                
+
                 _logger.LogInformation("创建新机器人实例成功");
                 return _bot;
             }
@@ -66,7 +66,7 @@ public class TelegramBotClientManager
         }
     }
 
-    public async Task<bool> CanPingTelegram()
+    public async Task<bool> CanPingTelegramAsync()
     {
         if (_bot == null)
         {
@@ -76,8 +76,8 @@ public class TelegramBotClientManager
 
         try
         {
-            var me = await _bot.GetMe();
-            return me != null && me.Id == _bot.BotId;
+            var cmds = await _bot.GetMyCommands();
+            return cmds != null;
         }
         catch (ObjectDisposedException)
         {

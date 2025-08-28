@@ -16,7 +16,7 @@ public class TelegramJob : IJob
     public async Task ExecuteAsync(JobExecutingContext context, CancellationToken stoppingToken)
     {
         _logger.LogInformation("检测机器人状态");
-        var isAlive = await _telegramBotClientManager.CanPingTelegram();
+        var isAlive = await _telegramBotClientManager.CanPingTelegramAsync();
 
         if (!isAlive)
         {

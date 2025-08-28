@@ -37,7 +37,8 @@ public class TelegramBotBackgroundService : BackgroundService
     {
         var commands = new[]
         {
-            new Telegram.Bot.Types.BotCommand { Command = "start", Description = "启动机器人" }
+            new Telegram.Bot.Types.BotCommand { Command = "start", Description = "启动机器人" },
+            new Telegram.Bot.Types.BotCommand { Command = "info", Description = "关于" },
         };
 
         foreach (var cmd in commands)
@@ -66,7 +67,7 @@ public class TelegramBotBackgroundService : BackgroundService
     private void ConfigureMessageHandling(Bot bot)
     {
         bot.OnMessage += async (msg, type) => await OnMessageAsync(bot, msg, type);
-        bot.OnUpdate += update => 
+        bot.OnUpdate += update =>
         {
             _logger.LogInformation("机器人处理更新");
             ProcessUpdate(bot, update);
@@ -99,9 +100,9 @@ public class TelegramBotBackgroundService : BackgroundService
     private async Task HandlePrivateAsync(Bot bot, WTelegram.Types.Message msg)
     {
         if (msg.Text == null) return;
-        
+
         var text = msg.Text.ToLower();
-        
+
         if (text.StartsWith("/start") || text == "/clonepack" || text == "clonepack" || text == "克隆" || text == "贴纸" || text == "tiezhi" || text == "表情" || text == "biaoqing" || text == "emoji" || text == "stickers")
         {
             await _stickerService.SendStickerInstructionsAsync(bot, msg);
@@ -109,6 +110,10 @@ public class TelegramBotBackgroundService : BackgroundService
         else if (text.StartsWith("克隆#"))
         {
             await _stickerService.HandleCloneCommandAsync(bot, msg);
+        }
+        else if (text.StartsWith("/info"))
+        {
+            await _stickerService.SendStickerInfoAsync(bot, msg);
         }
     }
 }
