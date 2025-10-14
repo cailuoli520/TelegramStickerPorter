@@ -3,31 +3,44 @@
 public class TelegramBotClientManager
 {
     private readonly ILogger<TelegramBotClientManager> _logger;
+    private readonly TelegramOptions _options;
     private Bot _bot;
     private readonly object _lockObject = new();
 
     public TelegramBotClientManager(ILogger<TelegramBotClientManager> logger)
     {
         _logger = logger;
+        _options = App.GetConfig<TelegramOptions>("Telegram") ?? throw Oops.Oh("未在配置中找到 Telegram 节点");
+        ValidateOptions(_options);
     }
 
-    public Bot CreatBot()
+    public bool HasActiveBot
+    {
+        get
+        {
+            lock (_lockObject)
+            {
+                return _bot != null;
+            }
+        }
+    }
+
+    public Bot CreateBot()
     {
         lock (_lockObject)
         {
             try
             {
-                StopBot();
+                StopBotInternal();
 
-                var data = App.GetConfig<TelegramOptions>("Telegram");
                 var basePath = AppContext.BaseDirectory;
                 var dbPath = Path.Combine(basePath, "TelegramBot.sqlite");
                 var connection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={dbPath}");
 
                 _bot = new Bot(
-                    data.BotToken,
-                    data.ApiId,
-                    data.ApiHash,
+                    _options.BotToken,
+                    _options.ApiId,
+                    _options.ApiHash,
                     connection,
                     SqlCommands.Sqlite);
 
@@ -49,6 +62,45 @@ public class TelegramBotClientManager
 
     public void StopBot()
     {
+        lock (_lockObject)
+        {
+            StopBotInternal();
+        }
+    }
+
+    public async Task<bool> CanPingTelegramAsync()
+    {
+        Bot bot;
+        lock (_lockObject)
+        {
+            bot = _bot;
+        }
+
+        if (bot == null)
+        {
+            _logger.LogWarning("机器人实例不存在，无法检测连接");
+            return false;
+        }
+
+        try
+        {
+            var cmds = await bot.GetMyCommands();
+            return cmds != null;
+        }
+        catch (ObjectDisposedException)
+        {
+            _logger.LogWarning("机器人实例已被释放，无法检测连接");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "检测机器人连接失败");
+            return false;
+        }
+    }
+
+    private void StopBotInternal()
+    {
         if (_bot == null) return;
 
         try
@@ -66,28 +118,15 @@ public class TelegramBotClientManager
         }
     }
 
-    public async Task<bool> CanPingTelegramAsync()
+    private static void ValidateOptions(TelegramOptions options)
     {
-        if (_bot == null)
-        {
-            _logger.LogWarning("机器人实例不存在，无法检测连接");
-            return false;
-        }
+        if (options.ApiId <= 0)
+            throw Oops.Oh("Telegram:ApiId 配置必须为正整数");
 
-        try
-        {
-            var cmds = await _bot.GetMyCommands();
-            return cmds != null;
-        }
-        catch (ObjectDisposedException)
-        {
-            _logger.LogWarning("机器人实例已被释放，无法检测连接");
-            return false;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "检测机器人连接失败");
-            return false;
-        }
+        if (string.IsNullOrWhiteSpace(options.ApiHash))
+            throw Oops.Oh("Telegram:ApiHash 配置不能为空");
+
+        if (string.IsNullOrWhiteSpace(options.BotToken))
+            throw Oops.Oh("Telegram:BotToken 配置不能为空");
     }
 }

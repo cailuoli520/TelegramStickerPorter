@@ -4,13 +4,16 @@ public class TelegramJob : IJob
 {
     private readonly ILogger<TelegramJob> _logger;
     private readonly TelegramBotClientManager _telegramBotClientManager;
+    private readonly TelegramBotBackgroundService _telegramBotBackgroundService;
 
     public TelegramJob(
         ILogger<TelegramJob> logger,
-        TelegramBotClientManager telegramBotClientManager)
+        TelegramBotClientManager telegramBotClientManager,
+        TelegramBotBackgroundService telegramBotBackgroundService)
     {
         _logger = logger;
         _telegramBotClientManager = telegramBotClientManager;
+        _telegramBotBackgroundService = telegramBotBackgroundService;
     }
 
     public async Task ExecuteAsync(JobExecutingContext context, CancellationToken stoppingToken)
@@ -20,8 +23,15 @@ public class TelegramJob : IJob
 
         if (!isAlive)
         {
-            _logger.LogInformation("机器人不响应，重新创建中...");
-            _telegramBotClientManager.CreatBot();
+            _logger.LogInformation("机器人不响应，尝试重新初始化...");
+            try
+            {
+                await _telegramBotBackgroundService.RestartBotAsync(stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "重新初始化机器人实例失败");
+            }
         }
         else
         {

@@ -19,6 +19,9 @@ public class MessageService
     {
         try
         {
+            if (bot == null)
+                throw new ArgumentNullException(nameof(bot));
+
             if (string.IsNullOrEmpty(messageText))
                 return 0;
 
@@ -31,12 +34,12 @@ public class MessageService
                 replyMarkup: inlineKeyboardMarkup
             );
 
-            _logger.LogWarning($"消息Id:{sendMessage.MessageId}发送消息: {messageText}");
+            _logger.LogInformation("消息发送成功。消息Id:{MessageId} 内容:{MessageText}", sendMessage.MessageId, messageText);
             return sendMessage.MessageId;
         }
         catch (Exception ex)
         {
-            _logger.LogError($"发送消息失败: {ex.Message}");
+            _logger.LogError(ex, "发送消息失败。ChatId:{ChatId} 内容:{MessageText}", chatId, messageText);
             return 0;
         }
     }
@@ -52,6 +55,9 @@ public class MessageService
     {
         try
         {
+            if (bot == null)
+                throw new ArgumentNullException(nameof(bot));
+
             if (string.IsNullOrEmpty(messageText))
                 return;
 
@@ -66,7 +72,7 @@ public class MessageService
         }
         catch (Exception ex)
         {
-            _logger.LogError($"修改消息失败: {ex.Message}");
+            _logger.LogError(ex, "修改消息失败。ChatId:{ChatId} MessageId:{MessageId}", chatId, messageId);
         }
     }
 }

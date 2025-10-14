@@ -5,6 +5,7 @@ public class TelegramBotBackgroundService : BackgroundService
     private readonly TelegramBotClientManager _telegramBotClientManager;
     private readonly ILogger<TelegramBotBackgroundService> _logger;
     private readonly StickerService _stickerService;
+    private readonly SemaphoreSlim _restartLock = new(1, 1);
 
     public TelegramBotBackgroundService(
         ILogger<TelegramBotBackgroundService> logger,
@@ -20,12 +21,11 @@ public class TelegramBotBackgroundService : BackgroundService
     {
         try
         {
-            _logger.LogInformation("正在启动机器人...");
-            var bot = _telegramBotClientManager.CreatBot();
-            var me = await bot.GetMe();
-            _logger.LogInformation($"机器人启动: @{me.Username}");
-
-            await InitializeBotAsync(bot);
+            await EnsureBotInitializedAsync(stoppingToken);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            _logger.LogInformation("机器人后台服务已取消");
         }
         catch (Exception ex)
         {
@@ -33,7 +33,44 @@ public class TelegramBotBackgroundService : BackgroundService
         }
     }
 
-    private async Task InitializeBotAsync(Bot bot)
+    public Task EnsureBotInitializedAsync(CancellationToken cancellationToken = default)
+        => InitializeInternalAsync(forceRestart: false, cancellationToken);
+
+    public Task RestartBotAsync(CancellationToken cancellationToken = default)
+        => InitializeInternalAsync(forceRestart: true, cancellationToken);
+
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("正在停止机器人后台服务");
+        _telegramBotClientManager.StopBot();
+        await base.StopAsync(cancellationToken);
+    }
+
+    private async Task InitializeInternalAsync(bool forceRestart, CancellationToken cancellationToken)
+    {
+        await _restartLock.WaitAsync(cancellationToken);
+        try
+        {
+            if (!forceRestart && _telegramBotClientManager.HasActiveBot)
+            {
+                _logger.LogDebug("检测到机器人已在线，跳过初始化");
+                return;
+            }
+
+            _logger.LogInformation(forceRestart ? "正在重新初始化机器人..." : "正在初始化机器人...");
+            var bot = _telegramBotClientManager.CreateBot();
+            var me = await bot.GetMe();
+            _logger.LogInformation($"机器人启动: @{me.Username}");
+
+            await ConfigureBotAsync(bot);
+        }
+        finally
+        {
+            _restartLock.Release();
+        }
+    }
+
+    private async Task ConfigureBotAsync(Bot bot)
     {
         var commands = new[]
         {
