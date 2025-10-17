@@ -2,8 +2,6 @@
 
 > 一个优雅且高效的 Telegram 贴纸 / 表情克隆工具
 > 支持 **贴纸包搬运**、**表情包克隆**，一键转移，极简操作！
->
-> 演示机器人 [@StickerPorter_Bot](https://t.me/StickerPorter_Bot)
 
 ------
 
@@ -15,16 +13,6 @@
 - ⚙️ 基于 .NET 9.0 构建，性能可靠
 - 🔐 使用 Telegram Bot API，简单配置即可部署
 - 🧩 本软件免费无毒，可在虚拟机中运行进行长期挂机。
-
-------
-
-### AD -- 机场推广
-
-
-
-**机场 - 老百姓自己的机场**：[https://老百姓自己的机场.com](https://xn--mes53dm4ex3lhhtdb891k3sd.com/)
-咱老百姓就得用自己的机场 **老百姓自己的机场** 做用的起的机场
-
 
 
 ## 🛠 环境要求
@@ -74,19 +62,3 @@
 ```
 
 ------
-
-## 📃 License
-
-[MIT License](https://github.com/Riniba/TelegramStickerPorter/blob/main/LICENSE)
-
-------
-
-## ❤️ 其他
-
-> 🗨️ 有问题或者建议欢迎提 Issue，也可以直接发 PR！
->
-> - Telegram 私聊：https://t.me/Riniba
-> - Telegram 频道：https://t.me/RinibaChannel
-> - Telegram 群组：https://t.me/RinibaGroup
->
-> 本项目目标是打造最简洁的 Telegram 贴纸搬运工具 🛠️
