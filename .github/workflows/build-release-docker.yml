@@ -67,6 +67,12 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Code Quality Checks
+        run: |
+          echo "Running basic code quality checks..."
+          dotnet restore "${{ env.PROJECT_PATH }}"
+          dotnet build "${{ env.PROJECT_PATH }}" --verbosity normal --no-restore
+          echo "✓ Basic compilation check passed"
       - name: Publish
         run: |
           dotnet publish "${{ env.PROJECT_PATH }}" \
