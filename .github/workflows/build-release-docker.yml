@@ -1,9 +1,11 @@
 name: Build & Release + Docker
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
+      - feature/sticker-download-functionality
     paths-ignore:
       - '**.md'
       - '.gitignore'
