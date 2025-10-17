@@ -76,6 +76,8 @@ public class TelegramBotBackgroundService : BackgroundService
         {
             new Telegram.Bot.Types.BotCommand { Command = "start", Description = "启动机器人" },
             new Telegram.Bot.Types.BotCommand { Command = "info", Description = "关于" },
+            new Telegram.Bot.Types.BotCommand { Command = "download", Description = "下载贴纸包" },
+            new Telegram.Bot.Types.BotCommand { Command = "help_download", Description = "下载帮助" },
         };
 
         foreach (var cmd in commands)
@@ -151,6 +153,14 @@ public class TelegramBotBackgroundService : BackgroundService
         else if (text.StartsWith("/info"))
         {
             await _stickerService.SendStickerInfoAsync(bot, msg);
+        }
+        else if (text.StartsWith("下载#") || text.StartsWith("/download") || text.Contains("download"))
+        {
+            await _stickerService.HandleDownloadCommandAsync(bot, msg);
+        }
+        else if (text.StartsWith("/help_download") || text.Contains("帮助下载"))
+        {
+            await _stickerService.SendDownloadInstructionsAsync(bot, msg);
         }
     }
 }
